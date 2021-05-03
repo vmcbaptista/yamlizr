@@ -10,7 +10,9 @@ namespace CasCap.Services
 {
     public class ApiService : HttpClientBase
     {
-        public ApiService(string PAT)
+        private readonly string _baseUrl;
+
+        public ApiService(string PAT, string baseUrl)
         {
             _logger = ApplicationLogging.CreateLogger<ApiService>();
             _client = new HttpClient();
@@ -18,11 +20,12 @@ namespace CasCap.Services
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var bytes = Encoding.ASCII.GetBytes($"{string.Empty}:{PAT}");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
+            _baseUrl = baseUrl;
         }
 
         public async Task<List<TaskObj>> GetAllExtensions(string organisation)
         {
-            var res = await Get<Tasks, object>($"https://dev.azure.com/{organisation}/_apis/distributedtask/tasks/");
+            var res = await Get<Tasks, object>($"{_baseUrl}/{organisation}/_apis/distributedtask/tasks/");
             return res.result is object && res.result is object && res.result.value is object ? res.result.value : null;
         }
 
@@ -37,7 +40,7 @@ namespace CasCap.Services
 {pipelineYaml}
 "
             };
-            var res = await PostJsonAsync<string, object>($"https://dev.azure.com/{organisation}/{project}/_apis/pipelines/{pipelineId}/runs?api-version=6.0-preview.1", req);
+            var res = await PostJsonAsync<string, object>($"{_baseUrl}/{organisation}/{project}/_apis/pipelines/{pipelineId}/runs?api-version=6.0-preview.1", req);
             return res.result is object ? res.result : null;
         }
     }

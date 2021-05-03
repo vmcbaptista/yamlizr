@@ -88,9 +88,9 @@ namespace CasCap.Commands
             return _project is object;
         }
 
-        protected bool Connect(string PAT, string organisation)
+        protected bool Connect(string PAT, string baseUrl, string organisation)
         {
-            var uriString = $"https://dev.azure.com/{organisation}";
+            var uriString = $"{baseUrl}/{organisation}";
             _console.Write($"Connecting to Azure DevOps REST API, {uriString} ...");
             try
             {
@@ -100,7 +100,7 @@ namespace CasCap.Commands
                 _buildClient = _connection.GetClient<BuildHttpClient>();
                 _releaseClient = _connection.GetClient<ReleaseHttpClient>();
                 _taskAgentClient = _connection.GetClient<TaskAgentHttpClient>();
-                _apiService = new ApiService(PAT);
+                _apiService = new ApiService(PAT, baseUrl);
             }
             catch (Exception ex)
             {

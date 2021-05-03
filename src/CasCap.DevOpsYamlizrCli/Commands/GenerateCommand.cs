@@ -50,6 +50,9 @@ namespace CasCap.Commands
         [Option("--githubactions", Description = "Convert to GitHub Actions (also forces inline to true) [default: false]")]
         public bool gitHubActions { get; }
 
+        [Option("--baseUrl", Description = "Base URL of your Azure DevOps installation [default: https://dev.azure.com/]")]
+        public string baseUrl { get; } = "https://dev.azure.com/";
+
         public async Task<int> OnExecuteAsync(IConsole _console)
         {
             if (gitHubActions) inlineTaskGroups = true;//github actions don't support templates
@@ -90,7 +93,7 @@ namespace CasCap.Commands
             _console.ForegroundColor = fgColor;
             #endregion
 
-            if (!Connect(PAT, organisation))
+            if (!Connect(PAT, baseUrl, organisation))
                 return 1;
 
             if (!await GetProject(project))
